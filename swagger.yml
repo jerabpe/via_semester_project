@@ -1,0 +1,269 @@
+openapi: '3.0.2'
+info:
+  title: What to watch
+  version: '1.0'
+servers:
+  - url: localhost
+paths:
+  /user/login:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username or password.
+  /user:
+    post: 
+      tags: 
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Login'
+      responses:
+        '201':
+          description: User created and logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Username taken.
+  /user/logout:
+    get:
+      tags:
+        - User
+      description: Logs out the current user.
+      responses:
+        default:
+          description: Success.
+  /list/{id}:
+    get:
+      tags:
+        - Watch List
+      description: 'Gets given list owned by user.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchList'
+        '404':
+          description: WatchList not found.
+    delete:
+      tags:
+        - Watch List
+      description: 'Deletes list with given id.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchList'
+        '404':
+          description: WatchList not found.
+  /list/{id}/add:  
+    put:
+      tags:
+        - Watch List
+      description: 'Adds Movie to WatchList with given id.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: movieId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'List updated.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchList'
+        '404':
+          description: 'Not found.'
+        '401':
+          description: 'User must be logged in to update their list.'
+        '403':
+          description: 'User can only edit list that belongs to them.'
+  /list/{id}/remove:  
+    put:
+      tags:
+        - Watch List
+      description: 'Removes Movie to WatchList with given id.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: movieId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'List updated.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchList'
+        '404':
+          description: 'Not found.'
+        '401':
+          description: 'User must be logged in to update their list.'
+        '403':
+          description: 'User can only edit list that belongs to them.'
+  /list:
+    post: 
+      tags:
+        - Watch List
+      description: 'Creates new Watch List.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatchList'
+      responses:
+        '201':
+          description: List created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchList'
+        '401':
+          description: 'User must be logged in to create list.'
+        '400':
+          description: 'List cannot be created.'
+  /movie/{id}:
+    get:
+      tags:
+        - Movie
+      description: 'Finds movie with given ID'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: 'Not found.'
+  /movie/date:
+    get:
+      tags:
+        - Movie
+      description: 'Finds movies in coming the week of given date.'
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+
+          
+
+
+
+            
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id: 
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        trailer:
+          type: string #iframe or the whole object?
+    WatchList:
+      type: object
+      properties:
+        id: 
+          type: integer
+          format: int64
+        title:
+          type: string
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+        
+        
+
+        
+
