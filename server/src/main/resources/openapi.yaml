@@ -2,31 +2,24 @@ openapi: '3.0.2'
 info:
   title: What to watch
   version: '1.0'
-servers:
-  - url: localhost
 paths:
-  /user/login:
-    post:
-      tags:
-        - User
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
+  /user/{id}:
+    summary: 'Logs in the user.'
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        '200':
-          description: Login successful.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid username or password.
+        '204':
+          description: User deleted.
+        '404':
+          description: Invalid id, not found.
   /user:
-    post: 
-      tags: 
-        - User
+    post:
       requestBody:
         content:
           application/json:
@@ -41,18 +34,19 @@ paths:
                 $ref: '#/components/schemas/User'
         '400':
           description: Username taken.
-  /user/logout:
     get:
-      tags:
-        - User
-      description: Logs out the current user.
+      description: Get all users.
       responses:
-        default:
-          description: Success.
+        '200':
+          description: List of all users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
   /list/{id}:
     get:
-      tags:
-        - Watch List
       description: 'Gets given list owned by user.'
       parameters:
         - name: id
@@ -71,8 +65,6 @@ paths:
         '404':
           description: WatchList not found.
     delete:
-      tags:
-        - Watch List
       description: 'Deletes list with given id.'
       parameters:
         - name: id
@@ -92,8 +84,6 @@ paths:
           description: WatchList not found.
   /list/{id}/add:  
     put:
-      tags:
-        - Watch List
       description: 'Adds Movie to WatchList with given id.'
       parameters:
         - name: id
@@ -122,8 +112,6 @@ paths:
           description: 'User can only edit list that belongs to them.'
   /list/{id}/remove:  
     put:
-      tags:
-        - Watch List
       description: 'Removes Movie to WatchList with given id.'
       parameters:
         - name: id
@@ -151,9 +139,7 @@ paths:
         '403':
           description: 'User can only edit list that belongs to them.'
   /list:
-    post: 
-      tags:
-        - Watch List
+    post:
       description: 'Creates new Watch List.'
       requestBody:
         content:
@@ -171,17 +157,28 @@ paths:
           description: 'User must be logged in to create list.'
         '400':
           description: 'List cannot be created.'
+    get:
+      description: 'Gets all WatchLists for current user.'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WatchList'
+        '401':
+          description: 'User must be authorized to see their lists.'
   /movie/{id}:
     get:
-      tags:
-        - Movie
       description: 'Finds movie with given ID'
       parameters:
         - name: id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: 'Success.'
@@ -191,18 +188,9 @@ paths:
                 $ref: '#/components/schemas/Movie'
         '404':
           description: 'Not found.'
-  /movie/date:
+  /movie/now:
     get:
-      tags:
-        - Movie
-      description: 'Finds movies in coming the week of given date.'
-      parameters:
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
+      description: 'Finds best newest movies.'
       responses:
         '200':
           description: 'Success'
@@ -212,12 +200,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Movie'
-
-          
-
-
-
-            
 components:
   schemas:
     User:
@@ -240,16 +222,22 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         title:
           type: string
         description:
           type: string
         releaseDate:
           type: string
-          format: date
         trailer:
           type: string #iframe or the whole object?
+        genres:
+          type: array
+          items:
+            type: string
+        popularity:
+          type: number
+          format: float
     WatchList:
       type: object
       properties:
