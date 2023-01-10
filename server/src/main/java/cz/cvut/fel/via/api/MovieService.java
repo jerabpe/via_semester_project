@@ -57,7 +57,6 @@ public class MovieService implements MovieApiDelegate {
         });
 
         return ResponseEntity.ok()
-                .header("Access-Control-Allow-Origin", "*")
                 .body(dtoList);
     }
 

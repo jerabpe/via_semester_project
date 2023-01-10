@@ -1,4 +1,4 @@
-const MOVIES_NOW_URL = 'data.json';//'http://localhost:8080/movie/now';
+const MOVIES_NOW_URL = 'http://localhost:8080/movie/now';
 
 const welcomePage = document.querySelector("#welcomePage");
 const letsWatchButton = document.querySelector("#letsWatchButton");
@@ -52,7 +52,9 @@ letsWatchButton.addEventListener("click", e => {
 
 window.addEventListener("load", e => {
     //call server
-    fetch(MOVIES_NOW_URL)
+    fetch(MOVIES_NOW_URL, {
+        credentials: 'include'
+    })
         .then((response) => response.json())
         .then(data => {
             console.log(data);
@@ -93,6 +95,25 @@ window.addEventListener("load", e => {
             for(b of addButtons){
                 b.addEventListener("click", e => {
                     e.preventDefault();
+                    fetch('http://localhost:8080/list', {
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(lists => {
+                        console.log(lists);
+                        let index = 0;
+                        watchLists = lists;
+                        for(l of lists){
+                            const opt = document.createElement("option");
+                            opt.value = l.id;
+                            opt.innerHTML = l.title;
+                            if(index == 0){
+                                opt.selected = true;
+                            }
+                            index++;
+                            select.append(opt);
+                        }
+                    });
                     selectedMovie = e.path[0].id;
                     addMovie.classList.remove("d-none");
                     shownPage.classList.add("d-none");
@@ -151,26 +172,6 @@ loginButton.addEventListener("click", e => {
     for(b of addButtons){
         b.classList.remove("d-none");
     }
-
-    fetch('http://localhost:8080/list', {
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(lists => {
-        console.log(lists);
-        let index = 0;
-        watchLists = lists;
-        for(l of lists){
-            const opt = document.createElement("option");
-            opt.value = l.id;
-            opt.innerHTML = l.title;
-            if(index == 0){
-                opt.selected = true;
-            }
-            index++;
-            select.append(opt);
-        }
-    });
 
     //todo - show Add Movie to list buttons!
 });
@@ -240,7 +241,7 @@ logoutButton.addEventListener("click", e => {
 });
 
 myListsButton.addEventListener("click", e => {
-
+    listsGrid.innerHTML = '';
     fetch('http://localhost:8080/list', {
         credentials: 'include'
     })
