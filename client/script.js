@@ -95,6 +95,7 @@ window.addEventListener("load", e => {
             for(b of addButtons){
                 b.addEventListener("click", e => {
                     e.preventDefault();
+                    select.innerHTML = '';
                     fetch('http://localhost:8080/list', {
                         credentials: 'include'
                     })
