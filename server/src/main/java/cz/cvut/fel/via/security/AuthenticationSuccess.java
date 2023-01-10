@@ -41,6 +41,7 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         final UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
+        userDto.setIsAdmin(user.isAdmin());
         objectMapper.writeValue(response.getOutputStream(), userDto);
     }
 

@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -43,10 +44,11 @@ public class MovieService implements MovieApiDelegate {
         List<Movie> movies = new ArrayList<>();
         result.getResults().forEach(m -> {
             //call movieDB API for details
+            //System.out.println(m.getTitle()+", " + m.getId());
             Movie movie = loadMovieFromAPI(m.getId());
             movies.add(movie);
         });
-        //todo test
+
         loadTrailers(movies);
 
         List<MovieDto> dtoList = new ArrayList<>();
@@ -54,12 +56,16 @@ public class MovieService implements MovieApiDelegate {
             dtoList.add(toDto(m));
         });
 
-        return ResponseEntity.ok(dtoList);
+        return ResponseEntity.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .body(dtoList);
     }
 
     private Movie loadMovieFromAPI(int id){
         RestTemplate restTemplate = new RestTemplate();
+        //System.out.println("Loading movie from MovieDB_API id: " + id);
         MovieDetails details = restTemplate.getForObject(MOVIE_ID_URI+id+"?"+MOVIE_API_KEY+"&language=en-US", MovieDetails.class);
+        //System.out.println(details.getTitle() + " loaded.");
         Movie movie = new Movie();
         movie.setId(details.getId());
         movie.setDescription(details.getOverview());
@@ -71,13 +77,14 @@ public class MovieService implements MovieApiDelegate {
         movie.setPopularity(details.getPopularity());
         return movie;
     }
-    //todo test this
+
     private void loadTrailers(List<Movie> movies){
         movies.forEach(m -> {
             Optional<Movie> movieOptional = movieRepository.findById(m.getId());
             if(!movieOptional.isPresent()){
                 //if not in db - load from yt
                 //call YT API
+                //System.out.println("fetching trailer for " + m.getTitle());
                 RestTemplate restTemplate = new RestTemplate();
                 String ytRes = restTemplate.getForObject(YT_SEARCH+YT_API_KEY+"&q="+m.getTitle()+" trailer", String.class);
                 JSONParser parser = new JSONParser();
@@ -88,9 +95,8 @@ public class MovieService implements MovieApiDelegate {
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
-                //System.out.println(videoId);
+                //System.out.println("videoID: "+videoId);
 
-                //todo test this
                 ytRes = restTemplate.getForObject(YT_VIDEO_BY_ID+YT_API_KEY+"&id="+videoId+"&part=player", String.class);
                 String player;
                 try{
@@ -103,13 +109,13 @@ public class MovieService implements MovieApiDelegate {
                 m.setTrailer(player);
                 movieRepository.saveAndFlush(m);
             } else {
+                //System.out.println("trailer already in db");
                 m.setTrailer(movieOptional.get().getTrailer());
             }
         });
 
     }
 
-    //todo test
     @Override
     public ResponseEntity<MovieDto> movieIdGet(Integer id) {
         Optional<Movie> movieOptional = movieRepository.findById(id);

@@ -10,7 +10,7 @@ public class MovieDetails {
     private boolean adult;
     private String backdrop_path;
     private Object belongs_to_collection;
-    private int budget;
+    private Long budget;
     List<Genre> genres;
     private String homepage;
     private int id;
@@ -23,7 +23,7 @@ public class MovieDetails {
     List<ProdCompany> production_companies;
     List <ProdCountry> production_countries;
     private String release_date;
-    private int revenue;
+    private Long revenue;
     private int runtime;
     List<SpokenLanguage> spoken_languages;
     private String status;

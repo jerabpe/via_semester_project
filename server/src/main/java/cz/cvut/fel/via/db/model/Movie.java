@@ -15,6 +15,8 @@ public class Movie {
 
     private String title;
 
+    @Lob
+    @Column
     private String description;
 
     private String releaseDate;

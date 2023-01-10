@@ -32,7 +32,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '400':
+        '409':
           description: Username taken.
     get:
       description: Get all users.
@@ -62,6 +62,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WatchList'
+        '401':
+          description: 'User must be logged in to see their list.'
+        '403':
+          description: User is not owner.
         '404':
           description: WatchList not found.
     delete:
@@ -80,6 +84,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WatchList'
+        '401':
+          description: 'User must be logged in to delete their list.'
+        '403':
+          description: User is not owner.
         '404':
           description: WatchList not found.
   /list/{id}/add:  
@@ -96,7 +104,8 @@ paths:
           in: query
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
         '200':
           description: 'List updated.'
@@ -124,7 +133,8 @@ paths:
           in: query
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
         '200':
           description: 'List updated.'
@@ -169,7 +179,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/WatchList'
         '401':
-          description: 'User must be authorized to see their lists.'
+          description: 'User must be logged in to see their lists.'
   /movie/{id}:
     get:
       description: 'Finds movie with given ID'
@@ -211,6 +221,8 @@ components:
           example: 10
         username:
           type: string
+        isAdmin:
+          type: boolean
     Login:
       type: object
       properties:
@@ -230,7 +242,7 @@ components:
         releaseDate:
           type: string
         trailer:
-          type: string #iframe or the whole object?
+          type: string #iframe
         genres:
           type: array
           items:

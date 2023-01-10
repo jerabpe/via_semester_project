@@ -27,7 +27,7 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        System.out.println("authentication of user" + authentication.getPrincipal().toString());
+        System.out.println("authentication of user " + authentication.getPrincipal().toString());
         final String username = authentication.getPrincipal().toString();
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isPresent()){
@@ -37,10 +37,12 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
                 return SecurityUtils.setCurrentUser(user);
             } else {
                 //todo ex or stg
+                System.out.println("wrong password");
                 return null;
             }
         }
         //todo exception or stg
+        System.out.println("User not found");
         return null;
     }
 
