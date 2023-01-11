@@ -393,7 +393,7 @@ function loadLists(){
                         el.classList.add("form-check");
                         el.classList.add("form-white");
                         el.innerHTML = `
-                        <input type="checkbox" class="form-check-input" id="${idx}" value="${m.id}">
+                        <input type="radio" class="form-check-input" id="${idx}" value="${m.id}" name="editListRadio">
                         <label class="form-check-label" for="${idx}">
                           ${m.title}
                         </label>
@@ -426,34 +426,26 @@ saveListEditButton.addEventListener("click", e => {
     e.preventDefault();
     const checklist = document.querySelector("#editListCheckList");
     //console.log(checklist);
-    const movies = [];
+    let movie;
     for(const child of checklist.children){
         if(child.children[0].checked){
-            movies.push(child.children[0].value);
-            //const res = removeMovieFromList(editedList, child.children[0].value);
-            //console.log(res);
+            movie = child.children[0].value;
+            break;
         }
     }
     console.log(movies);
     removeMoviesFromList(editedList, movies);
 });
 
-let removeCounter = 0;
-function removeMoviesFromList(listId, movies){
-    removeCounter = 0;
-    for(const movieId of movies){
-        fetch(BASE_URL + "/list/" + listId + "/remove?movieId=" + movieId, {
-            method: 'PUT',
-            credentials: 'include'
-        }).then(response => response.json())
-        .then(data => {
-            console.log(data);
-            removeCounter++;
-            if(removeCounter >= movies.length){
-                loadLists();
-                editListPage.classList.add("d-none");
-                shownPage.classList.remove("d-none");
-            }
-        });
-    }
+function removeMoviesFromList(listId, movieId){
+    fetch(BASE_URL + "/list/" + listId + "/remove?movieId=" + movieId, {
+        method: 'PUT',
+        credentials: 'include'
+    }).then(response => response.json())
+    .then(data => {
+        console.log(data);
+        loadLists();
+        editListPage.classList.add("d-none");
+        shownPage.classList.remove("d-none");
+    });
 }
