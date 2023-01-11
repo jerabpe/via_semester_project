@@ -55,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .usernameParameter("username").passwordParameter("password")
                 .and()
                 .logout().invalidateHttpSession(true)//.deleteCookies(COOKIES_TO_DESTROY)
-                .logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler);//.logoutSuccessHandler(logoutSuccessHandler);
-
+                .logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler)//.logoutSuccessHandler(logoutSuccessHandler);
+                .and().headers().frameOptions().disable();
     }
 }

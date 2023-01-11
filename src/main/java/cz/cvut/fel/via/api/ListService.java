@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -56,13 +57,14 @@ public class ListService implements ListApiDelegate {
             List<WatchListDto> dtoList = new ArrayList<>();
             list.forEach(l -> {
                 dtoList.add(toDTO(l));
-                System.out.println(l.getTitle());
+                //System.out.println(l.getTitle());
             });
             return ResponseEntity.ok(dtoList);
         }
     }
 
     @Override
+    @Transactional
     public ResponseEntity<WatchListDto> listIdAddPut(Long id, Integer movieId) {
         Principal p = null;
         if(RequestContextHolder.getRequestAttributes() == null){
@@ -91,8 +93,8 @@ public class ListService implements ListApiDelegate {
                         WatchList list = listOptional.get();
                         if(!list.getMovies().contains(optionalMovie.get())){
                             list.getMovies().add(optionalMovie.get());
+                            listRepository.saveAndFlush(list);
                         }
-                        listRepository.saveAndFlush(list);
                         return new ResponseEntity<>(toDTO(list), HttpStatus.OK);
                     } else {
                         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -170,6 +172,7 @@ public class ListService implements ListApiDelegate {
 
 
     @Override
+    @Transactional
     public ResponseEntity<WatchListDto> listIdRemovePut(Long id, Integer movieId) {
         Principal p = null;
         if(RequestContextHolder.getRequestAttributes() == null){

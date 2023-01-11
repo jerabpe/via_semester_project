@@ -16,7 +16,7 @@ public class WatchList {
 
     private String title;
 
-    @OneToMany
+    @ManyToMany
     private List<Movie> movies;
 
     @OneToOne
